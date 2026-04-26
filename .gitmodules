@@ -1,0 +1,3 @@
+[submodule ".repos/authgate"]
+	path = .repos/authgate
+	url = https://github.com/cagojeiger/authgate

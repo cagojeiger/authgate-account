@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --font-sans:                var(--font-sans);
+  --font-mono:                var(--font-mono);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --color-destructive:        var(--destructive);
+  --radius-sm:  calc(var(--radius) * 0.5);
+  --radius-md:  var(--radius);
+  --radius-lg:  calc(var(--radius) * 1.5);
+  --radius-xl:  calc(var(--radius) * 2);
+}
+
+/* ─── Project Jelly — Soft Light ─────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --background:           #fafbfc;
+  --foreground:           #0a0b0d;
+  --card:                 #ffffff;
+  --card-foreground:      #0a0b0d;
+  --popover:              #ffffff;
+  --popover-foreground:   #0a0b0d;
+
+  /* Brand — Jelly violet */
+  --primary:              #7170ff;
+  --primary-foreground:   #ffffff;
+
+  /* Neutral */
+  --secondary:            #f4f5f7;
+  --secondary-foreground: #3a3f4a;
+  --muted:                #f4f5f7;
+  --muted-foreground:     #9ca0a8;
+  --accent:               #f6f3ff;
+  --accent-foreground:    #7170ff;
+
+  /* Status */
+  --destructive:          #e0365b;
+
+  /* Chrome */
+  --border:               rgba(10,11,13,0.08);
+  --input:                rgba(10,11,13,0.08);
+  --ring:                 rgba(167,139,255,0.32);
+
+  /* Radius — 8px base */
+  --radius: 0.5rem;
+
+  /* Jelly custom tokens (for direct use) */
+  --jelly-fg-1:           #0a0b0d;
+  --jelly-fg-2:           #3a3f4a;
+  --jelly-fg-3:           #5e6470;
+  --jelly-fg-4:           #9ca0a8;
+  --jelly-brand:          #a78bff;
+  --jelly-brand-deep:     #7170ff;
+  --jelly-brand-hover:    #8f72ff;
+  --jelly-brand-soft:     rgba(167,139,255,0.12);
+  --jelly-gradient-blob:  linear-gradient(135deg, #ffb6e6 0%, #e48bff 45%, #a78bff 100%);
+  --jelly-shadow-card:    0 1px 2px rgba(10,11,30,0.04), 0 2px 6px rgba(10,11,30,0.04);
+  --jelly-shadow-elevated: 0 4px 12px rgba(10,11,30,0.06), 0 2px 4px rgba(10,11,30,0.04);
+  --jelly-green:          #1f9e4a;
+  --jelly-green-soft:     rgba(31,158,74,0.10);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv01", "ss03";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
