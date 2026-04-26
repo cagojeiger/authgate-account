@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
+import type { ReactNode } from "react"
+import { useCallback, useEffect, useState, useTransition } from "react"
 
 interface Connection {
   client_id: string
@@ -17,18 +18,26 @@ interface Props {
 
 export function ConnectedApps({ compact, ownClientId }: Props) {
   const [connections, setConnections] = useState<Connection[] | null>(null)
+  const [loadError, setLoadError] = useState(false)
   const [confirming, setConfirming] = useState<string | null>(null)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const load = () => {
+  const load = useCallback(() => {
+    setLoadError(false)
     fetch("/api/account/connections")
       .then((r) => r.json())
       .then((data) => setConnections(data.connections ?? []))
-      .catch(() => setConnections([]))
-  }
+      .catch(() => {
+        setLoadError(true)
+        setConnections([])
+      })
+  }, [])
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    const timer = window.setTimeout(load, 0)
+    return () => window.clearTimeout(timer)
+  }, [load])
 
   const disconnect = (clientId: string) => {
     setDisconnecting(clientId)
@@ -40,13 +49,12 @@ export function ConnectedApps({ compact, ownClientId }: Props) {
     })
   }
 
-  if (connections === null) return <EmptyState>Loading…</EmptyState>
-  if (connections.length === 0) {
-    return <EmptyState>No apps are currently holding access to your account.</EmptyState>
-  }
+  if (connections === null) return <SkeletonRows />
+  if (loadError) return <EmptyState>Could not load connected apps.</EmptyState>
+  if (connections.length === 0) return <EmptyState>No connected apps.</EmptyState>
 
   return (
-    <div className={compact ? "" : "rounded-xl overflow-hidden bg-card"} style={compact ? {} : { border: "1px solid var(--border)", boxShadow: "var(--jelly-shadow-card)" }}>
+    <div className={compact ? "" : "overflow-hidden rounded-lg border border-[var(--account-border)] bg-[var(--account-surface)]"}>
       {connections.map((svc, i) => {
         const isSelf = svc.client_id === ownClientId
         const isConfirming = confirming === svc.client_id
@@ -54,78 +62,76 @@ export function ConnectedApps({ compact, ownClientId }: Props) {
         return (
           <div
             key={svc.client_id}
-            className="flex items-start justify-between px-5 py-3.5 gap-3 transition-colors hover:bg-accent"
-            style={i < connections.length - 1 ? { borderBottom: "1px solid var(--border)" } : {}}
+            className="px-4 py-3.5"
+            style={i < connections.length - 1 ? { borderBottom: "1px solid var(--account-border)" } : {}}
           >
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium" style={{ color: "var(--jelly-fg-1)" }}>{svc.name}</p>
-              <p className="text-xs mt-0.5 truncate" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>
-                {svc.url ?? svc.client_id}
-                {svc.last_used ? ` · last used ${formatRelative(svc.last_used)}` : ""}
+            <div className="flex items-start justify-between gap-3">
+              <p className="min-w-0 truncate text-sm font-medium text-[var(--account-text-primary)]">
+                {svc.name}
               </p>
-              {svc.scopes?.length > 0 && (
-                <p className="text-xs mt-0.5 truncate" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)", fontSize: 10 }}>
-                  {svc.scopes.join(" · ")}
-                </p>
-              )}
-              {isConfirming && (
-                <p className="text-xs mt-1.5" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-3)", fontSize: 11 }}>
-                  Disconnects this app. Existing access may still work up to ~15 min until its token expires. The service itself is not deleted.
-                </p>
+              {isSelf && <CurrentBadge />}
+            </div>
+
+            <p className="mt-1 truncate font-mono text-xs text-[var(--account-text-muted)]">
+              {svc.url ?? svc.client_id}
+            </p>
+
+            {svc.scopes?.length > 0 && (
+              <p className="mt-1 truncate font-mono text-[11px] text-[var(--account-text-muted)]">
+                {svc.scopes.join(" · ")}
+              </p>
+            )}
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="min-w-0 truncate font-mono text-xs text-[var(--account-text-muted)]">
+                last used {formatRelative(svc.last_used)}
+              </p>
+              {!isSelf && !isConfirming && (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {svc.url && (
+                    <a
+                      href={svc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-md px-2 py-1 text-xs font-medium text-[var(--account-brand)] transition-colors hover:bg-[var(--account-brand-soft)]"
+                    >
+                      Open ↗
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setConfirming(svc.client_id)}
+                    disabled={isBusy || isPending}
+                    className="rounded-md px-2 py-1 text-xs text-[var(--account-text-secondary)] transition-colors hover:bg-[var(--account-brand-soft)] disabled:opacity-50"
+                  >
+                    {isBusy ? "…" : "Disconnect"}
+                  </button>
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              {svc.url && !isConfirming && (
-                <a href={svc.url} target="_blank" rel="noopener noreferrer"
-                  className="text-xs font-medium px-2 py-1 rounded-md transition-colors"
-                  style={{ color: "var(--jelly-brand-deep)" }}>
-                  Open ↗
-                </a>
-              )}
-              {isSelf ? (
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--jelly-green)",
-                    background: "var(--jelly-green-soft)",
-                    border: "1px solid rgba(31,158,74,0.18)",
-                    fontSize: 10,
-                  }}
-                  title="You are signed in to this account page. Use the top-right Sign out button to leave."
-                >
-                  current
-                </span>
-              ) : isConfirming ? (
-                <>
+
+            {isConfirming && (
+              <div className="mt-3 rounded-md border border-[var(--account-border)] bg-[var(--account-bg)] px-3 py-2">
+                <p className="font-mono text-[11px] leading-5 text-[var(--account-text-secondary)]">
+                  ⚠ This revokes {svc.name}&apos;s refresh token. Existing access may still work up to ~15 min.
+                </p>
+                <div className="mt-2 flex justify-end gap-1.5">
                   <button
                     onClick={() => setConfirming(null)}
                     disabled={isPending}
-                    className="text-xs px-2 py-1 rounded-md transition-colors disabled:opacity-50"
-                    style={{ color: "var(--jelly-fg-4)" }}
+                    className="rounded-md px-2 py-1 text-xs text-[var(--account-text-muted)] transition-colors hover:bg-[var(--account-brand-soft)] disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => disconnect(svc.client_id)}
                     disabled={isPending}
-                    className="text-xs font-medium px-2 py-1 rounded-md transition-colors disabled:opacity-50"
-                    style={{ color: "var(--jelly-red, #e0365b)" }}
+                    className="rounded-md px-2 py-1 text-xs font-medium text-[var(--account-danger)] transition-colors hover:bg-[var(--account-brand-soft)] disabled:opacity-50"
                   >
                     Confirm disconnect
                   </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setConfirming(svc.client_id)}
-                  disabled={isBusy || isPending}
-                  className="text-xs px-2 py-1 rounded-md transition-colors disabled:opacity-50"
-                  style={{ color: "var(--jelly-fg-4)" }}
-                >
-                  {isBusy ? "…" : "Disconnect"}
-                </button>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         )
       })}
@@ -146,10 +152,37 @@ function formatRelative(iso: string): string {
   return d.toLocaleDateString()
 }
 
-function EmptyState({ children }: { children: React.ReactNode }) {
+function CurrentBadge() {
   return (
-    <div className="px-5 py-4">
-      <p className="text-sm" style={{ color: "var(--jelly-fg-3)" }}>{children}</p>
+    <span className="shrink-0 rounded-full border border-[rgba(31,158,74,0.18)] bg-[var(--account-current-soft)] px-2 py-0.5 font-mono text-[10px] text-[var(--account-current)]">
+      current
+    </span>
+  )
+}
+
+function SkeletonRows() {
+  return (
+    <div>
+      {[0, 1].map((row) => (
+        <div
+          key={row}
+          className="px-4 py-3.5"
+          style={row === 0 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+        >
+          <div className="h-4 w-2/5 animate-pulse rounded bg-[var(--account-border)]" />
+          <div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-[var(--account-border)]" />
+          <div className="mt-2 h-3 w-3/5 animate-pulse rounded bg-[var(--account-border)]" />
+          <div className="mt-3 h-4 w-full animate-pulse rounded bg-[var(--account-border)]" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyState({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-4 py-4">
+      <p className="text-sm text-[var(--account-text-secondary)]">{children}</p>
     </div>
   )
 }

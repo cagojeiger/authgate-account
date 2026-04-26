@@ -76,6 +76,19 @@
   --jelly-shadow-elevated: 0 4px 12px rgba(10,11,30,0.06), 0 2px 4px rgba(10,11,30,0.04);
   --jelly-green:          #1f9e4a;
   --jelly-green-soft:     rgba(31,158,74,0.10);
+
+  --account-bg:           var(--background);
+  --account-surface:      var(--card);
+  --account-border:       var(--border);
+  --account-text-primary: var(--jelly-fg-1);
+  --account-text-secondary: var(--jelly-fg-2);
+  --account-text-muted:   var(--jelly-fg-4);
+  --account-brand:        var(--jelly-brand-deep);
+  --account-brand-soft:   var(--jelly-brand-soft);
+  --account-danger:       var(--destructive);
+  --account-current:      var(--jelly-green);
+  --account-current-soft: var(--jelly-green-soft);
+  --account-focus-ring:   var(--ring);
 }
 
 @layer base {

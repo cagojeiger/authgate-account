@@ -1,6 +1,7 @@
+import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
-import { getSession } from "@/lib/session"
 import { config } from "@/lib/config"
+import { getSession } from "@/lib/session"
 import { ConnectedApps } from "./connected-apps"
 import { RecentActivity } from "./recent-activity"
 
@@ -14,149 +15,100 @@ export default async function Account() {
     ?? "U"
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-background">
-
-      {/* Topbar */}
-      <header
-        className="shrink-0 flex items-center justify-between px-6 h-14 bg-card"
-        style={{ borderBottom: "1px solid var(--border)" }}
-      >
-        <div className="flex items-center gap-2" style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
-          <span style={{ color: "var(--jelly-brand-deep)", fontWeight: 600 }}>project-jelly.io</span>
-          <span style={{ color: "var(--jelly-fg-4)" }}>/</span>
-          <span style={{ color: "var(--jelly-fg-3)" }}>account</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold text-white"
-            style={{ background: "var(--jelly-gradient-blob)" }}
-            title={session.email}
-          >
-            {initials}
+    <div className="h-dvh flex flex-col overflow-hidden bg-[var(--account-bg)]">
+      <header className="sticky top-0 z-10 h-13 sm:h-14 lg:h-14 shrink-0 border-b border-[var(--account-border)] bg-[var(--account-surface)]">
+        <div className="mx-auto flex h-full w-full max-w-[880px] items-center justify-between gap-3 px-4 sm:max-w-[720px] sm:px-5 lg:max-w-[880px] lg:px-6">
+          <div className="min-w-0 flex items-center gap-2 font-mono text-xs">
+            <span className="truncate font-semibold text-[var(--account-brand)]">project-jelly.io</span>
+            <span className="shrink-0 text-[var(--account-text-muted)]">/</span>
+            <span className="truncate text-[var(--account-text-secondary)]">account</span>
           </div>
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="text-xs font-medium px-2 py-1 rounded-md transition-colors hover:bg-secondary cursor-pointer"
-              style={{ color: "var(--jelly-fg-3)" }}
+          <div className="shrink-0 flex items-center gap-3">
+            <div
+              className="flex size-7 items-center justify-center rounded-full bg-[var(--account-brand)] text-xs font-semibold text-white"
+              title={session.email}
             >
-              Sign out
-            </button>
-          </form>
+              {initials}
+            </div>
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-[var(--account-text-secondary)] transition-colors hover:bg-[var(--account-brand-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--account-focus-ring)]"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      {/* Bento grid */}
-      <div className="flex-1 min-h-0 flex">
-        <main className="flex-1 min-w-0 min-h-0 p-4 grid grid-cols-12 grid-rows-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 overflow-hidden">
-
-          {/* Identity */}
-          <div
-            className="col-span-5 row-span-1 min-h-0 flex flex-col rounded-xl overflow-hidden bg-card"
-            style={{ border: "1px solid var(--border)", boxShadow: "var(--jelly-shadow-card)" }}
-          >
-            <CardHeader title="Identity" />
-            <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
-              {/* Profile */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-full flex-col gap-3 px-4 py-4 sm:max-w-[720px] sm:gap-4 sm:px-5 sm:py-5 lg:max-w-[880px] lg:px-6 lg:py-6">
+          <Section title="Me">
+            <div className="px-4 py-4">
               <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white shrink-0"
-                  style={{ background: "var(--jelly-gradient-blob)" }}
-                >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--account-brand)] text-sm font-semibold text-white">
                   {initials}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: "var(--jelly-fg-1)" }}>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-[var(--account-text-primary)]">
                     {session.name || session.email || "Account"}
                   </p>
-                  <p className="text-xs mt-0.5 truncate" style={{ color: "var(--jelly-fg-3)" }}>
+                  <p className="mt-0.5 truncate text-xs text-[var(--account-text-secondary)]">
                     {session.email}
                   </p>
                 </div>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full shrink-0"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--jelly-green)",
-                    background: "var(--jelly-green-soft)",
-                    border: "1px solid rgba(31,158,74,0.18)",
-                  }}
-                >
-                  active
-                </span>
+                <StatusBadge>active</StatusBadge>
               </div>
 
-              <div style={{ borderTop: "1px solid var(--border)" }} />
+              <hr className="my-4 border-[var(--account-border)]" />
 
-              {/* Meta */}
               <div className="space-y-2">
                 <MetaRow label="sub" value={session.sub} />
                 <MetaRow label="issuer" value={issuer} />
               </div>
             </div>
-          </div>
+          </Section>
 
-          {/* Connected apps */}
-          <div
-            className="col-span-7 row-span-1 min-h-0 flex flex-col rounded-xl overflow-hidden bg-card"
-            style={{ border: "1px solid var(--border)", boxShadow: "var(--jelly-shadow-card)" }}
-          >
-            <CardHeader title="Connected apps" meta="Only signed-in services shown" />
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              <ConnectedApps compact />
-            </div>
-          </div>
+          <Section title="Connected apps">
+            <ConnectedApps compact ownClientId={config.authgate.clientId} />
+          </Section>
 
-          {/* Recent activity — full width */}
-          <div
-            className="col-span-12 row-span-1 min-h-0 flex flex-col rounded-xl overflow-hidden bg-card"
-            style={{ border: "1px solid var(--border)", boxShadow: "var(--jelly-shadow-card)" }}
-          >
-            <CardHeader title="Recent activity" />
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              <RecentActivity compact limit={12} />
-            </div>
-          </div>
-
-        </main>
-      </div>
-
-      {/* Footer */}
-      <footer
-        className="shrink-0 flex items-center justify-between px-6 py-2.5"
-        style={{ borderTop: "1px solid var(--border)" }}
-      >
-        <span className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>project-jelly.io</span>
-        <span className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>authgate-account</span>
-      </footer>
-
+          <Section title="Recent activity">
+            <RecentActivity compact limit={12} />
+          </Section>
+        </div>
+      </main>
     </div>
   )
 }
 
-function CardHeader({ title, meta }: { title: string; meta?: string }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div
-      className="shrink-0 flex items-center justify-between px-5 py-3"
-      style={{ borderBottom: "1px solid var(--border)" }}
-    >
-      <h2 className="text-xs font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-2)", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-        {title}
-      </h2>
-      {meta && (
-        <span className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>
-          {meta}
-        </span>
-      )}
-    </div>
+    <section className="overflow-hidden rounded-lg border border-[var(--account-border)] bg-[var(--account-surface)]">
+      <div className="border-b border-[var(--account-border)] px-4 py-3">
+        <h2 className="font-mono text-xs font-semibold uppercase text-[var(--account-text-secondary)]">
+          {title}
+        </h2>
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function StatusBadge({ children }: { children: ReactNode }) {
+  return (
+    <span className="shrink-0 rounded-full border border-[rgba(31,158,74,0.18)] bg-[var(--account-current-soft)] px-2 py-0.5 font-mono text-[10px] text-[var(--account-current)]">
+      {children}
+    </span>
   )
 }
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-xs shrink-0" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>{label}</span>
-      <span className="text-xs text-right truncate" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-2)" }}>{value}</span>
+    <div className="flex items-center justify-between gap-3 font-mono text-xs">
+      <span className="shrink-0 text-[var(--account-text-muted)]">{label}</span>
+      <span className="truncate text-right text-[var(--account-text-secondary)]">{value}</span>
     </div>
   )
 }

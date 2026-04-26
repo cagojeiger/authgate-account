@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import type { ReactNode } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 interface AuditEvent {
   id: number
@@ -16,8 +17,7 @@ const EVENT_COLOR: Record<string, string> = {
   "auth.signup":             "var(--jelly-brand-deep)",
   "auth.logout":             "var(--jelly-fg-3)",
   "auth.token_revoked":      "#d97706",
-  "auth.connection_revoked": "var(--jelly-red, #e0365b)",
-  "auth.session_revoked":    "var(--jelly-fg-3)",
+  "auth.connection_revoked": "var(--account-danger)",
   "token.refresh":           "var(--jelly-fg-4)",
 }
 
@@ -26,8 +26,13 @@ function groupByDate(events: AuditEvent[]) {
   const today = new Date().toDateString()
   const yesterday = new Date(Date.now() - 86400000).toDateString()
   for (const e of events) {
-    const d = new Date(e.created_at).toDateString()
-    const label = d === today ? "Today" : d === yesterday ? "Yesterday" : new Date(e.created_at).toLocaleDateString()
+    const eventDate = new Date(e.created_at)
+    const d = eventDate.toDateString()
+    const label = d === today
+      ? "Today"
+      : d === yesterday
+        ? "Yesterday"
+        : `${String(eventDate.getDate()).padStart(2, "0")} ${eventDate.toLocaleString(undefined, { month: "short" })}`
     const last = groups[groups.length - 1]
     if (last?.label === label) last.events.push(e)
     else groups.push({ label, events: [e] })
@@ -37,86 +42,95 @@ function groupByDate(events: AuditEvent[]) {
 
 export function RecentActivity({ compact, limit = 20 }: { compact?: boolean; limit?: number }) {
   const [events, setEvents] = useState<AuditEvent[] | null>(null)
+  const [loadError, setLoadError] = useState(false)
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
   const pageLimit = compact ? limit : 20
 
-  const load = (p: number, append = false) => {
+  const load = useCallback((p: number, append = false) => {
+    setLoadError(false)
     fetch(`/api/account/audit-log?page=${p}&limit=${pageLimit}`)
       .then((r) => r.json())
       .then((data) => {
         setEvents((prev) => append ? [...(prev ?? []), ...(data.events ?? [])] : (data.events ?? []))
         setTotal(data.total ?? 0)
-        setPage(p)
       })
-      .catch(() => setEvents([]))
-  }
+      .catch(() => {
+        setLoadError(true)
+        setEvents([])
+      })
+  }, [pageLimit])
 
-  useEffect(() => { load(1) }, [])
+  useEffect(() => {
+    const timer = window.setTimeout(() => load(1), 0)
+    return () => window.clearTimeout(timer)
+  }, [load])
 
-  if (events === null) return <EmptyState>Loading…</EmptyState>
-  if (events.length === 0) return <EmptyState>No events yet.</EmptyState>
+  if (events === null) return <SkeletonRows />
+  if (loadError) return <EmptyState>Could not load recent activity.</EmptyState>
+  if (events.length === 0) return <EmptyState>No recent activity.</EmptyState>
 
-  const groups = groupByDate(events)
-  const hasMore = !compact && events.length < total
+  const visibleEvents = compact ? events.slice(0, 12) : events
+  const groups = groupByDate(visibleEvents)
+  const remaining = Math.max(total - visibleEvents.length, 0)
 
   return (
     <div>
       {groups.map((group, gi) => (
         <div key={group.label}>
-          {/* Date group header */}
-          <div className="px-5 py-1.5" style={{ background: "var(--secondary)", borderBottom: "1px solid var(--border)" }}>
-            <span className="text-xs font-medium" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-3)" }}>
+          <div className="border-b border-[var(--account-border)] bg-[var(--account-bg)] px-4 py-1.5">
+            <span className="font-mono text-xs font-medium text-[var(--account-text-secondary)]">
               {group.label}
             </span>
           </div>
-          {group.events.map((e, i) => (
-            <div
-              key={e.id}
-              className="flex items-start justify-between px-5 py-3 gap-3 transition-colors hover:bg-accent"
-              style={gi < groups.length - 1 || i < group.events.length - 1 ? { borderBottom: "1px solid var(--border)" } : {}}
-            >
-              <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                <span
-                  className="shrink-0 w-1.5 h-1.5 rounded-full mt-1"
-                  style={{ background: EVENT_COLOR[e.event_type] ?? "var(--jelly-fg-4)" }}
-                />
-                <div className="min-w-0">
-                  <p className="text-xs font-medium" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-2)" }}>
-                    {e.event_type}
-                  </p>
-                  <p className="text-xs truncate mt-0.5" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>
-                    {e.ip_address ? e.ip_address.replace(/\/\d+$/, "") : "—"}
-                    {e.metadata?.client_id ? ` · ${e.metadata.client_id}` : ""}
-                  </p>
+          {group.events.map((e, i) => {
+            const clientId = typeof e.metadata?.client_id === "string" ? e.metadata.client_id : ""
+            const ip = e.ip_address ? e.ip_address.replace(/\/\d+$/, "") : "—"
+            const time = new Date(e.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            return (
+              <div
+                key={e.id}
+                className="px-4 py-2.5"
+                style={gi < groups.length - 1 || i < group.events.length - 1 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+              >
+                <div className="hidden min-w-0 items-center gap-2 font-mono text-xs text-[var(--account-text-muted)] sm:flex">
+                  <span
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{ background: EVENT_COLOR[e.event_type] ?? "var(--jelly-fg-4)" }}
+                  />
+                  <span className="shrink-0 font-medium text-[var(--account-text-secondary)]">{e.event_type}</span>
+                  {clientId && <span className="truncate">{clientId}</span>}
+                  <span className="shrink-0">·</span>
+                  <span className="shrink-0">{ip}</span>
+                  <span className="ml-auto shrink-0">{time}</span>
+                </div>
+
+                <div className="min-w-0 font-mono text-xs sm:hidden">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="size-1.5 shrink-0 rounded-full"
+                      style={{ background: EVENT_COLOR[e.event_type] ?? "var(--jelly-fg-4)" }}
+                    />
+                    <span className="min-w-0 flex-1 truncate font-medium text-[var(--account-text-secondary)]">
+                      {e.event_type}
+                    </span>
+                    <span className="shrink-0 text-[var(--account-text-muted)]">{time}</span>
+                  </div>
+                  {clientId && (
+                    <p className="mt-1 truncate pl-3.5 text-[var(--account-text-muted)]">
+                      {clientId}
+                    </p>
+                  )}
                 </div>
               </div>
-              <p className="text-xs shrink-0" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>
-                {new Date(e.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       ))}
 
-      {/* Load more — only in non-compact mode */}
-      {hasMore && (
-        <div className="px-5 py-3 flex justify-center" style={{ borderTop: "1px solid var(--border)" }}>
-          <button
-            onClick={() => load(page + 1, true)}
-            className="text-xs font-medium px-4 py-1.5 rounded-lg transition-colors"
-            style={{ color: "var(--jelly-brand-deep)", background: "var(--accent)", border: "1px solid var(--border)" }}
-          >
-            Load more ({total - events.length} remaining)
-          </button>
-        </div>
-      )}
-
-      {/* Compact: show total count */}
-      {compact && total > events.length && (
-        <div className="px-5 py-3" style={{ borderTop: "1px solid var(--border)" }}>
-          <p className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}>
-            +{total - events.length} more events
+      {compact && remaining > 0 && (
+        <div className="border-t border-[var(--account-border)] px-4 py-3">
+          <p className="font-mono text-xs text-[var(--account-text-muted)]">
+            +{remaining} more events
           </p>
         </div>
       )}
@@ -124,10 +138,26 @@ export function RecentActivity({ compact, limit = 20 }: { compact?: boolean; lim
   )
 }
 
-function EmptyState({ children }: { children: React.ReactNode }) {
+function SkeletonRows() {
   return (
-    <div className="px-5 py-4">
-      <p className="text-sm" style={{ color: "var(--jelly-fg-3)" }}>{children}</p>
+    <div>
+      {[0, 1, 2, 3].map((row) => (
+        <div
+          key={row}
+          className="px-4 py-2.5"
+          style={row < 3 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+        >
+          <div className="h-4 w-full animate-pulse rounded bg-[var(--account-border)]" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyState({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-4 py-4">
+      <p className="text-sm text-[var(--account-text-secondary)]">{children}</p>
     </div>
   )
 }
