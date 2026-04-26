@@ -168,11 +168,15 @@ Forbidden mutations:
 breakpoints (Tailwind defaults)
   mobile  < 640px              container 100%, padding 16px, header 52px
   tablet  640px - 1023px       container 720px, padding 20px, header 56px
-  desktop >= 1024px            container 880px, padding 24px, header 56px
+  desktop >= 1024px            container 1200px, padding 24px, header 56px
 
-  Information architecture is identical across breakpoints.
-  Only width, padding, and a few row-level wraps change.
+  /account spatial arrangement
+    mobile / tablet            single column, three sections stacked
+    desktop                    Me full-width hero on top
+                               + 2-column body: Connected apps | Recent activity
 ```
+
+The information architecture (Me / Connected apps / Recent activity, two mutations) is identical across breakpoints. Desktop spreads the two list sections side-by-side because they are both list-like and benefit from horizontal use of space; sections themselves are unchanged.
 
 Single-route SPA-style page. No additional pages such as `view all activity` or `device list`. Adding a new route is itself a scope-creep signal.
 

@@ -25,7 +25,7 @@ export default async function Account() {
           borderBottom: "1px solid var(--jelly-border-subtle)",
         }}
       >
-        <div className="mx-auto flex h-full w-full max-w-[880px] items-center justify-between gap-3 px-4 sm:max-w-[720px] sm:px-5 lg:max-w-[880px] lg:px-6">
+        <div className="mx-auto flex h-full w-full max-w-[880px] items-center justify-between gap-3 px-4 sm:max-w-[720px] sm:px-5 lg:max-w-[1200px] lg:px-6">
           <div className="min-w-0 flex items-center gap-2 font-mono text-xs">
             <span className="truncate font-semibold text-[var(--account-brand)]">project-jelly.io</span>
             <span className="shrink-0 text-[var(--account-text-muted)]">/</span>
@@ -51,7 +51,7 @@ export default async function Account() {
       </header>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-full flex-col gap-3 px-4 py-4 sm:max-w-[720px] sm:gap-4 sm:px-5 sm:py-5 lg:max-w-[880px] lg:px-6 lg:py-6">
+        <div className="mx-auto flex w-full max-w-full flex-col gap-3 px-4 py-4 sm:max-w-[720px] sm:gap-4 sm:px-5 sm:py-5 lg:max-w-[1200px] lg:px-6 lg:py-6">
           <Section title="Me">
             <div className="px-4 py-4">
               <div className="flex items-center gap-3">
@@ -78,13 +78,15 @@ export default async function Account() {
             </div>
           </Section>
 
-          <Section title="Connected apps">
-            <ConnectedApps compact ownClientId={config.authgate.clientId} />
-          </Section>
+          <div className="flex flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-2 lg:gap-4">
+            <Section title="Connected apps">
+              <ConnectedApps compact ownClientId={config.authgate.clientId} />
+            </Section>
 
-          <Section title="Recent activity">
-            <RecentActivity compact limit={12} />
-          </Section>
+            <Section title="Recent activity">
+              <RecentActivity compact limit={12} />
+            </Section>
+          </div>
         </div>
       </main>
     </div>

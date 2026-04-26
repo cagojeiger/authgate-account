@@ -3,75 +3,112 @@ import Image from "next/image"
 export default function Home() {
   return (
     <div
-      className="flex flex-col flex-1 items-center justify-center min-h-screen relative overflow-hidden"
+      className="flex min-h-screen flex-1 flex-col items-center justify-center overflow-hidden lg:grid lg:grid-cols-2 lg:items-stretch lg:justify-stretch"
       style={{ background: "var(--jelly-bg-canvas)" }}
     >
-      {/* Subtle glow background */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(167,139,255,0.08) 0%, transparent 70%)",
-        }}
-      />
-
-      <main className="relative w-full max-w-sm px-6 text-center z-10">
-        {/* Logomark — full image (blob + jelly text) */}
-        <div className="flex justify-center mb-6">
-          <Image
-            src="/logo.png"
-            alt="project-jelly"
-            width={96}
-            height={96}
-            className="rounded-2xl"
-            priority
-          />
-        </div>
-
-        {/* Brand */}
-        <p
-          className="text-xs font-semibold tracking-widest uppercase mb-2"
-          style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-brand-deep)" }}
-        >
-          project-jelly.io
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight mb-2" style={{ color: "var(--jelly-fg-1)" }}>
-          Account
-        </h1>
-        <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--jelly-fg-3)" }}>
-          Sign in to manage your account<br />and connected services.
-        </p>
-
-        {/* Google Sign In */}
-        <a
-          href="/api/auth/login"
-          className="flex w-full items-center justify-center gap-2.5 rounded-[var(--jelly-radius-md)] bg-[var(--jelly-bg-surface)] px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--jelly-bg-subtle)]"
+      <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 py-16 text-center lg:min-h-screen lg:items-start lg:px-14 lg:py-12 lg:text-left">
+        {/* Subtle glow background */}
+        <div
+          className="pointer-events-none absolute inset-0"
           style={{
-            color: "var(--jelly-fg-1)",
-            border: "1px solid var(--jelly-border-std)",
-            boxShadow: "var(--jelly-shadow-subtle)",
+            background:
+              "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(167,139,255,0.08) 0%, transparent 70%)",
           }}
-        >
-          <GoogleIcon />
-          Continue with Google
-        </a>
+        />
 
-        {/* Powered by */}
-        <p
-          className="mt-8 text-xs"
+        <main className="relative z-10 w-full max-w-sm lg:max-w-xl">
+          {/* Logomark — full image (blob + jelly text) */}
+          <div className="mb-6 flex justify-center lg:justify-start">
+            <Image
+              src="/logo.png"
+              alt="project-jelly"
+              width={96}
+              height={96}
+              className="rounded-2xl lg:size-[120px]"
+              priority
+            />
+          </div>
+
+          {/* Brand */}
+          <p
+            className="mb-2 text-xs font-semibold uppercase tracking-widest"
+            style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-brand-deep)" }}
+          >
+            project-jelly.io
+          </p>
+          <h1 className="mb-2 text-2xl font-semibold tracking-tight lg:hidden" style={{ color: "var(--jelly-fg-1)" }}>
+            Account
+          </h1>
+          <p className="mb-8 text-sm leading-relaxed lg:hidden" style={{ color: "var(--jelly-fg-3)" }}>
+            Sign in to manage your account<br />and connected services.
+          </p>
+          <p className="hidden max-w-md text-lg leading-relaxed lg:block" style={{ color: "var(--jelly-fg-3)" }}>
+            See what authgate knows about your account.
+          </p>
+
+          {/* Google Sign In */}
+          <a
+            href="/api/auth/login"
+            className="flex w-full items-center justify-center gap-2.5 rounded-[var(--jelly-radius-md)] bg-[var(--jelly-bg-surface)] px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--jelly-bg-subtle)] lg:hidden"
+            style={{
+              color: "var(--jelly-fg-1)",
+              border: "1px solid var(--jelly-border-std)",
+              boxShadow: "var(--jelly-shadow-subtle)",
+            }}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </a>
+
+          {/* Powered by */}
+          <p
+            className="mt-8 text-xs lg:hidden"
+            style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
+          >
+            Powered by{" "}
+            <span style={{ color: "var(--jelly-brand-deep)" }}>authgate</span>
+          </p>
+        </main>
+
+        <footer
+          className="absolute bottom-6 text-xs lg:bottom-12 lg:left-14"
           style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
         >
-          Powered by{" "}
-          <span style={{ color: "var(--jelly-brand-deep)" }}>authgate</span>
-        </p>
-      </main>
+          authgate-account · project-jelly.io
+        </footer>
+      </section>
 
-      <footer
-        className="absolute bottom-6 text-xs"
-        style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
-      >
-        authgate-account · project-jelly.io
-      </footer>
+      <section className="hidden min-h-screen w-full flex-col justify-center px-14 py-12 lg:flex">
+        <div className="w-full max-w-sm">
+          <h2 className="mb-2 text-2xl font-semibold tracking-tight" style={{ color: "var(--jelly-fg-1)" }}>
+            Sign in to your account
+          </h2>
+          <p className="mb-8 text-sm leading-relaxed" style={{ color: "var(--jelly-fg-3)" }}>
+            Manage your authgate identity and connected apps.
+          </p>
+
+          <a
+            href="/api/auth/login"
+            className="flex w-full items-center justify-center gap-2.5 rounded-[var(--jelly-radius-md)] bg-[var(--jelly-bg-surface)] px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--jelly-bg-subtle)]"
+            style={{
+              color: "var(--jelly-fg-1)",
+              border: "1px solid var(--jelly-border-std)",
+              boxShadow: "var(--jelly-shadow-subtle)",
+            }}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </a>
+
+          <p
+            className="mt-8 text-xs"
+            style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
+          >
+            Powered by{" "}
+            <span style={{ color: "var(--jelly-brand-deep)" }}>authgate</span>
+          </p>
+        </div>
+      </section>
     </div>
   )
 }
