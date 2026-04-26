@@ -16,8 +16,9 @@ const EVENT_COLOR: Record<string, string> = {
   "auth.login":              "var(--jelly-green)",
   "auth.signup":             "var(--jelly-brand-deep)",
   "auth.logout":             "var(--jelly-fg-3)",
-  "auth.token_revoked":      "#d97706",
-  "auth.connection_revoked": "var(--account-danger)",
+  "auth.token_revoked":      "var(--jelly-amber)",
+  "auth.connection_revoked": "var(--jelly-red)",
+  "auth.session_revoked":    "var(--jelly-fg-3)",
   "token.refresh":           "var(--jelly-fg-4)",
 }
 
@@ -77,8 +78,8 @@ export function RecentActivity({ compact, limit = 20 }: { compact?: boolean; lim
     <div>
       {groups.map((group, gi) => (
         <div key={group.label}>
-          <div className="border-b border-[var(--account-border)] bg-[var(--account-bg)] px-4 py-1.5">
-            <span className="font-mono text-xs font-medium text-[var(--account-text-secondary)]">
+          <div className="border-b border-[var(--jelly-border-subtle)] bg-[var(--jelly-bg-subtle)] px-4 py-1.5">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[var(--jelly-fg-3)]">
               {group.label}
             </span>
           </div>
@@ -90,33 +91,33 @@ export function RecentActivity({ compact, limit = 20 }: { compact?: boolean; lim
               <div
                 key={e.id}
                 className="px-4 py-2.5"
-                style={gi < groups.length - 1 || i < group.events.length - 1 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+                style={gi < groups.length - 1 || i < group.events.length - 1 ? { borderBottom: "1px solid var(--jelly-border-subtle)" } : {}}
               >
-                <div className="hidden min-w-0 items-center gap-2 font-mono text-xs text-[var(--account-text-muted)] sm:flex">
+                <div className="jelly-mono hidden min-w-0 items-center gap-2 text-[var(--jelly-fg-4)] sm:flex">
                   <span
                     className="size-1.5 shrink-0 rounded-full"
                     style={{ background: EVENT_COLOR[e.event_type] ?? "var(--jelly-fg-4)" }}
                   />
-                  <span className="shrink-0 font-medium text-[var(--account-text-secondary)]">{e.event_type}</span>
+                  <span className="shrink-0 font-medium text-[var(--jelly-fg-2)]">{e.event_type}</span>
                   {clientId && <span className="truncate">{clientId}</span>}
                   <span className="shrink-0">·</span>
                   <span className="shrink-0">{ip}</span>
                   <span className="ml-auto shrink-0">{time}</span>
                 </div>
 
-                <div className="min-w-0 font-mono text-xs sm:hidden">
+                <div className="jelly-mono min-w-0 sm:hidden">
                   <div className="flex items-center gap-2">
                     <span
                       className="size-1.5 shrink-0 rounded-full"
                       style={{ background: EVENT_COLOR[e.event_type] ?? "var(--jelly-fg-4)" }}
                     />
-                    <span className="min-w-0 flex-1 truncate font-medium text-[var(--account-text-secondary)]">
+                    <span className="min-w-0 flex-1 truncate font-medium text-[var(--jelly-fg-2)]">
                       {e.event_type}
                     </span>
-                    <span className="shrink-0 text-[var(--account-text-muted)]">{time}</span>
+                    <span className="shrink-0 text-[var(--jelly-fg-4)]">{time}</span>
                   </div>
                   {clientId && (
-                    <p className="mt-1 truncate pl-3.5 text-[var(--account-text-muted)]">
+                    <p className="mt-1 truncate pl-3.5 text-[var(--jelly-fg-4)]">
                       {clientId}
                     </p>
                   )}
@@ -128,8 +129,8 @@ export function RecentActivity({ compact, limit = 20 }: { compact?: boolean; lim
       ))}
 
       {compact && remaining > 0 && (
-        <div className="border-t border-[var(--account-border)] px-4 py-3">
-          <p className="font-mono text-xs text-[var(--account-text-muted)]">
+        <div className="border-t border-[var(--jelly-border-subtle)] px-4 py-3">
+          <p className="font-mono text-xs text-[var(--jelly-fg-4)]">
             +{remaining} more events
           </p>
         </div>
@@ -147,7 +148,7 @@ function SkeletonRows() {
           className="px-4 py-2.5"
           style={row < 3 ? { borderBottom: "1px solid var(--account-border)" } : {}}
         >
-          <div className="h-4 w-full animate-pulse rounded bg-[var(--account-border)]" />
+          <div className="h-4 w-full animate-pulse rounded bg-[var(--jelly-bg-muted)]" />
         </div>
       ))}
     </div>

@@ -16,7 +16,15 @@ export default async function Account() {
 
   return (
     <div className="h-dvh flex flex-col overflow-hidden bg-[var(--account-bg)]">
-      <header className="sticky top-0 z-10 h-13 sm:h-14 lg:h-14 shrink-0 border-b border-[var(--account-border)] bg-[var(--account-surface)]">
+      <header
+        className="sticky top-0 z-10 h-13 sm:h-14 lg:h-14 shrink-0"
+        style={{
+          background: "rgba(250,251,252,0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--jelly-border-subtle)",
+        }}
+      >
         <div className="mx-auto flex h-full w-full max-w-[880px] items-center justify-between gap-3 px-4 sm:max-w-[720px] sm:px-5 lg:max-w-[880px] lg:px-6">
           <div className="min-w-0 flex items-center gap-2 font-mono text-xs">
             <span className="truncate font-semibold text-[var(--account-brand)]">project-jelly.io</span>
@@ -33,7 +41,7 @@ export default async function Account() {
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-[var(--account-text-secondary)] transition-colors hover:bg-[var(--account-brand-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--account-focus-ring)]"
+                className="cursor-pointer rounded-[var(--jelly-radius-md)] border border-[var(--jelly-border-std)] bg-white px-3 py-1.5 text-[13px] font-medium text-[var(--jelly-fg-1)] shadow-[var(--jelly-shadow-subtle)] transition-colors hover:bg-[var(--jelly-bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--account-focus-ring)]"
               >
                 Sign out
               </button>
@@ -47,7 +55,7 @@ export default async function Account() {
           <Section title="Me">
             <div className="px-4 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--account-brand)] text-sm font-semibold text-white">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[image:var(--jelly-gradient-blob)] text-sm font-semibold text-white">
                   {initials}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -85,9 +93,9 @@ export default async function Account() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-[var(--account-border)] bg-[var(--account-surface)]">
-      <div className="border-b border-[var(--account-border)] px-4 py-3">
-        <h2 className="font-mono text-xs font-semibold uppercase text-[var(--account-text-secondary)]">
+    <section className="overflow-hidden rounded-[var(--jelly-radius-lg)] border border-[var(--jelly-border-std)] bg-[var(--jelly-bg-surface)] shadow-[var(--jelly-shadow-card)]">
+      <div className="border-b border-[var(--jelly-border-subtle)] px-3.5 py-3.5">
+        <h2 className="jelly-tiny-upper">
           {title}
         </h2>
       </div>
@@ -98,7 +106,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function StatusBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="shrink-0 rounded-full border border-[rgba(31,158,74,0.18)] bg-[var(--account-current-soft)] px-2 py-0.5 font-mono text-[10px] text-[var(--account-current)]">
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--jelly-border-std)] bg-white px-3 py-1 text-xs font-medium text-[var(--jelly-fg-2)] shadow-[var(--jelly-shadow-subtle)]">
+      <span className="size-1.5 rounded-full bg-[var(--jelly-green)]" />
       {children}
     </span>
   )
@@ -106,9 +115,9 @@ function StatusBadge({ children }: { children: ReactNode }) {
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 font-mono text-xs">
-      <span className="shrink-0 text-[var(--account-text-muted)]">{label}</span>
-      <span className="truncate text-right text-[var(--account-text-secondary)]">{value}</span>
+    <div className="jelly-mono flex items-center justify-between gap-3">
+      <span className="shrink-0 text-[var(--jelly-fg-4)]">{label}</span>
+      <span className="truncate text-right text-[var(--jelly-fg-2)]">{value}</span>
     </div>
   )
 }

@@ -32,32 +32,39 @@
 /* ─── Project Jelly — Soft Light ─────────────────────────────────────── */
 :root {
   /* Surfaces */
-  --background:           #fafbfc;
-  --foreground:           #0a0b0d;
-  --card:                 #ffffff;
-  --card-foreground:      #0a0b0d;
-  --popover:              #ffffff;
-  --popover-foreground:   #0a0b0d;
+  --jelly-bg-canvas:      #fafbfc;
+  --jelly-bg-subtle:      #f4f5f7;
+  --jelly-bg-surface:     #ffffff;
+  --jelly-bg-muted:       #eceef2;
+  --jelly-bg-tint-pink:   #fef7fa;
+  --jelly-bg-tint-violet: #f6f3ff;
+
+  --background:           var(--jelly-bg-canvas);
+  --foreground:           var(--jelly-fg-1);
+  --card:                 var(--jelly-bg-surface);
+  --card-foreground:      var(--jelly-fg-1);
+  --popover:              var(--jelly-bg-surface);
+  --popover-foreground:   var(--jelly-fg-1);
 
   /* Brand — Jelly violet */
   --primary:              #7170ff;
   --primary-foreground:   #ffffff;
 
   /* Neutral */
-  --secondary:            #f4f5f7;
-  --secondary-foreground: #3a3f4a;
-  --muted:                #f4f5f7;
-  --muted-foreground:     #9ca0a8;
-  --accent:               #f6f3ff;
-  --accent-foreground:    #7170ff;
+  --secondary:            var(--jelly-bg-subtle);
+  --secondary-foreground: var(--jelly-fg-2);
+  --muted:                var(--jelly-bg-subtle);
+  --muted-foreground:     var(--jelly-fg-4);
+  --accent:               var(--jelly-bg-tint-violet);
+  --accent-foreground:    var(--jelly-brand-deep);
 
   /* Status */
   --destructive:          #e0365b;
 
   /* Chrome */
-  --border:               rgba(10,11,13,0.08);
-  --input:                rgba(10,11,13,0.08);
-  --ring:                 rgba(167,139,255,0.32);
+  --border:               var(--jelly-border-std);
+  --input:                var(--jelly-border-std);
+  --ring:                 var(--jelly-brand-ring);
 
   /* Radius — 8px base */
   --radius: 0.5rem;
@@ -67,28 +74,91 @@
   --jelly-fg-2:           #3a3f4a;
   --jelly-fg-3:           #5e6470;
   --jelly-fg-4:           #9ca0a8;
+  --jelly-fg-5:           #c4c7cd;
   --jelly-brand:          #a78bff;
   --jelly-brand-deep:     #7170ff;
   --jelly-brand-hover:    #8f72ff;
   --jelly-brand-soft:     rgba(167,139,255,0.12);
+  --jelly-brand-ring:     rgba(167,139,255,0.32);
   --jelly-gradient-blob:  linear-gradient(135deg, #ffb6e6 0%, #e48bff 45%, #a78bff 100%);
-  --jelly-shadow-card:    0 1px 2px rgba(10,11,30,0.04), 0 2px 6px rgba(10,11,30,0.04);
-  --jelly-shadow-elevated: 0 4px 12px rgba(10,11,30,0.06), 0 2px 4px rgba(10,11,30,0.04);
+  --jelly-gradient-soft:  linear-gradient(135deg, rgba(255,182,230,0.22) 0%, rgba(167,139,255,0.22) 100%);
+  --jelly-pink:           #ffb6e6;
+  --jelly-lilac:          #e48bff;
+  --jelly-violet:         #a78bff;
   --jelly-green:          #1f9e4a;
   --jelly-green-soft:     rgba(31,158,74,0.10);
+  --jelly-emerald:        #10b981;
+  --jelly-amber:          #d97706;
+  --jelly-red:            #e0365b;
+  --jelly-border-subtle:  rgba(10,11,13,0.04);
+  --jelly-border-std:     rgba(10,11,13,0.08);
+  --jelly-border-strong:  rgba(10,11,13,0.14);
+  --jelly-border-brand:   rgba(167,139,255,0.35);
+  --jelly-overlay:        rgba(10,11,30,0.50);
+  --jelly-radius-micro:   2px;
+  --jelly-radius-sm:      4px;
+  --jelly-radius-md:      8px;
+  --jelly-radius-lg:      12px;
+  --jelly-radius-xl:      16px;
+  --jelly-radius-2xl:     24px;
+  --jelly-radius-pill:    9999px;
+  --jelly-radius-circle:  50%;
+  --jelly-space-0:        1px;
+  --jelly-space-1:        4px;
+  --jelly-space-2:        7px;
+  --jelly-space-3:        8px;
+  --jelly-space-4:        11px;
+  --jelly-space-5:        12px;
+  --jelly-space-6:        16px;
+  --jelly-space-7:        20px;
+  --jelly-space-8:        24px;
+  --jelly-space-9:        32px;
+  --jelly-space-10:       48px;
+  --jelly-space-11:       64px;
+  --jelly-space-12:       80px;
+  --jelly-space-13:       120px;
+  --jelly-shadow-subtle:  0 1px 2px rgba(10,11,30,0.04);
+  --jelly-shadow-card:    0 1px 2px rgba(10,11,30,0.04), 0 2px 6px rgba(10,11,30,0.04);
+  --jelly-shadow-elevated: 0 4px 12px rgba(10,11,30,0.06), 0 2px 4px rgba(10,11,30,0.04);
+  --jelly-shadow-dialog:  0 24px 48px rgba(60,40,120,0.12), 0 6px 14px rgba(10,11,30,0.08), 0 2px 4px rgba(10,11,30,0.04);
+  --jelly-shadow-focus:   0 0 0 3px var(--jelly-brand-ring);
+  --jelly-shadow-glow:    0 12px 40px rgba(167,139,255,0.28), 0 4px 12px rgba(228,139,255,0.16);
+  --jelly-font-sans:      "Inter", "Inter Variable", "SF Pro Display", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --jelly-font-mono:      "JetBrains Mono", "Berkeley Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --jelly-w-light:        300;
+  --jelly-w-regular:      400;
+  --jelly-w-medium:       500;
+  --jelly-w-semibold:     600;
+  --jelly-font-features:  "cv01","ss03";
 
-  --account-bg:           var(--background);
-  --account-surface:      var(--card);
-  --account-border:       var(--border);
+  --account-bg:           var(--jelly-bg-canvas);
+  --account-surface:      var(--jelly-bg-surface);
+  --account-surface-hover: var(--jelly-bg-tint-violet);
+  --account-border:       var(--jelly-border-std);
   --account-text-primary: var(--jelly-fg-1);
   --account-text-secondary: var(--jelly-fg-2);
+  --account-text-tertiary: var(--jelly-fg-3);
   --account-text-muted:   var(--jelly-fg-4);
   --account-brand:        var(--jelly-brand-deep);
   --account-brand-soft:   var(--jelly-brand-soft);
-  --account-danger:       var(--destructive);
+  --account-danger:       var(--jelly-red);
   --account-current:      var(--jelly-green);
   --account-current-soft: var(--jelly-green-soft);
-  --account-focus-ring:   var(--ring);
+  --account-focus-ring:   var(--jelly-brand-ring);
+}
+
+.jelly-tiny-upper {
+  font-family: var(--jelly-font-mono);
+  font-size: 11px;
+  font-weight: var(--jelly-w-semibold);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--jelly-fg-3);
+}
+
+.jelly-mono {
+  font-family: var(--jelly-font-mono);
+  font-size: 13px;
 }
 
 @layer base {
@@ -97,7 +167,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "cv01", "ss03";
+    font-feature-settings: var(--jelly-font-features);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

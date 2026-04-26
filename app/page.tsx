@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div
       className="flex flex-col flex-1 items-center justify-center min-h-screen relative overflow-hidden"
-      style={{ background: "var(--background)" }}
+      style={{ background: "var(--jelly-bg-canvas)" }}
     >
       {/* Subtle glow background */}
       <div
@@ -31,7 +31,7 @@ export default function Home() {
         {/* Brand */}
         <p
           className="text-xs font-semibold tracking-widest uppercase mb-2"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-brand-deep)" }}
+          style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-brand-deep)" }}
         >
           project-jelly.io
         </p>
@@ -45,12 +45,11 @@ export default function Home() {
         {/* Google Sign In */}
         <a
           href="/api/auth/login"
-          className="flex w-full items-center justify-center gap-2.5 px-5 py-2.5 rounded-lg text-sm font-medium transition-all hover:shadow-md"
+          className="flex w-full items-center justify-center gap-2.5 rounded-[var(--jelly-radius-md)] bg-[var(--jelly-bg-surface)] px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--jelly-bg-subtle)]"
           style={{
-            background: "var(--card)",
             color: "var(--jelly-fg-1)",
-            border: "1px solid var(--border)",
-            boxShadow: "var(--jelly-shadow-card)",
+            border: "1px solid var(--jelly-border-std)",
+            boxShadow: "var(--jelly-shadow-subtle)",
           }}
         >
           <GoogleIcon />
@@ -60,7 +59,7 @@ export default function Home() {
         {/* Powered by */}
         <p
           className="mt-8 text-xs"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}
+          style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
         >
           Powered by{" "}
           <span style={{ color: "var(--jelly-brand-deep)" }}>authgate</span>
@@ -69,7 +68,7 @@ export default function Home() {
 
       <footer
         className="absolute bottom-6 text-xs"
-        style={{ fontFamily: "var(--font-mono)", color: "var(--jelly-fg-4)" }}
+        style={{ fontFamily: "var(--jelly-font-mono)", color: "var(--jelly-fg-4)" }}
       >
         authgate-account · project-jelly.io
       </footer>
