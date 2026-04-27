@@ -37,27 +37,39 @@ Tokens are per-client, not shared. SSO is the result of the authgate browser ses
 ## Positive Wireframe (locked)
 
 ```
+Login (/)
 ┌────────────────────────────────────────────────────┐
-│ project-jelly.io / account             [Sign out]  │
+│ authgate account                                   │
 ├────────────────────────────────────────────────────┤
+│             [BLOB]                                 │
+│        Manage connected services                   │
+│   See which services can access your authgate ...  │
+│                                                    │
+│   ┌───────────────────────────────────────────┐    │
+│   │ Continue with authgate                    │    │
+│   │ Sign in via Google                        │    │
+│   └───────────────────────────────────────────┘    │
+└────────────────────────────────────────────────────┘
+
+Account (/account)
+┌────────────────────────────────────────────────────┐
+│ authgate account       user@example.com [Sign out] │
+├────────────────────────────────────────────────────┤
+│ Overview │ [Services] │ Activity                   │  ← tabs (default Services)
+├────────────────────────────────────────────────────┤
+│ Connected Services                          3 apps │
 │ ┌────────────────────────────────────────────────┐ │
-│ │ Me                                             │ │
-│ │ name / email / status                          │ │
-│ │ sub / issuer                                   │ │
-│ └────────────────────────────────────────────────┘ │
-│ ┌────────────────────────────────────────────────┐ │
-│ │ Connected apps                                 │ │
-│ │ name / url / scopes / last used   [Disconnect] │ │
-│ └────────────────────────────────────────────────┘ │
-│ ┌────────────────────────────────────────────────┐ │
-│ │ Recent activity                                │ │
-│ │ event_type · client · ip · time                │ │
-│ │ +N more                                        │ │
+│ │ name · scopes · last used         [Revoke]     │ │
 │ └────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────┘
 ```
 
-Single page. Single route `/account`. Vertical stack at all breakpoints — only width and padding change between mobile / tablet / desktop.
+Three tabs:
+- **Overview** — read-only Email / Name / Status
+- **Services** (default) — connected apps with per-row Revoke
+- **Activity** — paginated audit log (page size 20, Prev/Next)
+
+Single route `/account`; tabs are client-side state (no URL routing required for V1).
 
 ## Negative Wireframe (forbidden)
 
@@ -168,17 +180,30 @@ Forbidden mutations:
 breakpoints (Tailwind defaults)
   mobile  < 640px              container 100%, padding 16px, header 52px
   tablet  640px - 1023px       container 720px, padding 20px, header 56px
-  desktop >= 1024px            container 1200px, padding 24px, header 56px
+  desktop >= 1024px            container 1100px, padding 24px, header 56px
 
-  /account spatial arrangement
-    mobile / tablet            single column, three sections stacked
-    desktop                    Me full-width hero on top
-                               + 2-column body: Connected apps | Recent activity
+  /account architecture
+    all breakpoints            tab strip (Overview / Services / Activity)
+                               + active tab content centered, mx-auto
+    only width and padding change between breakpoints
 ```
 
-The information architecture (Me / Connected apps / Recent activity, two mutations) is identical across breakpoints. Desktop spreads the two list sections side-by-side because they are both list-like and benefit from horizontal use of space; sections themselves are unchanged.
+The information architecture (3 tabs, two mutations: Sign out / Revoke connection) is identical across breakpoints. Tabs let users land directly on Services and let V2 add a tab without changing the rest of the layout.
 
 Single-route SPA-style page. No additional pages such as `view all activity` or `device list`. Adding a new route is itself a scope-creep signal.
+
+## Login UX (locked)
+
+The sign-in CTA must surface the authgate → upstream IdP chain so the user is not surprised by the next screen.
+
+```
+┌─────────────────────────────────────────┐
+│  Continue with authgate                 │  ← primary, brand fill
+│  Sign in via Google                     │  ← subtitle
+└─────────────────────────────────────────┘
+```
+
+Authgate is the issuer; Google (or future upstream IdP) is named explicitly. Both lines stay inside one button — they describe one action.
 
 ## What this also is — secondary identity
 
