@@ -1,7 +1,7 @@
 "use client"
 
-import type { ReactNode } from "react"
 import { useCallback, useEffect, useState } from "react"
+import { EmptyState } from "@/components/empty-state"
 
 interface Connection {
   client_id: string
@@ -41,6 +41,8 @@ export function ConnectedApps({ ownClientId }: Props) {
   }, [])
 
   useEffect(() => {
+    // Defer to next tick so setState in `load` runs outside the effect body
+    // (react-hooks/set-state-in-effect).
     const timer = window.setTimeout(() => {
       void load()
     }, 0)
@@ -114,7 +116,7 @@ export function ConnectedApps({ ownClientId }: Props) {
 
                   <div className="mt-2 flex items-center justify-between gap-3">
                     <span className="min-w-0 truncate font-mono text-xs text-[var(--jelly-fg-4)]">
-                      last used {formatRelative(svc.last_used)}
+                      {svc.last_used ? `last used ${formatRelative(svc.last_used)}` : "never used"}
                     </span>
                     {!isSelf && (
                       <div className="flex shrink-0 items-center gap-1.5">
@@ -212,7 +214,7 @@ function SkeletonRows() {
         <div
           key={row}
           className="flex items-start gap-3 px-5 py-4"
-          style={row === 0 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+          style={row === 0 ? { borderBottom: "1px solid var(--jelly-border-subtle)" } : {}}
         >
           <div className="mt-2 size-1.5 shrink-0 animate-pulse rounded-full bg-[var(--jelly-bg-muted)]" />
           <div className="min-w-0 flex-1">
@@ -223,14 +225,6 @@ function SkeletonRows() {
           </div>
         </div>
       ))}
-    </div>
-  )
-}
-
-function EmptyState({ children }: { children: ReactNode }) {
-  return (
-    <div className="px-5 py-5">
-      <p className="text-sm text-[var(--account-text-secondary)]">{children}</p>
     </div>
   )
 }

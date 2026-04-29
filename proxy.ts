@@ -14,7 +14,7 @@ const sessionOptions = {
 
 const protectedPaths = ["/account"]
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const isProtected = protectedPaths.some((p) => req.nextUrl.pathname.startsWith(p))
   if (!isProtected) return NextResponse.next()
 

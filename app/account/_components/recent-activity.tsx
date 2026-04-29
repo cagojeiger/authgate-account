@@ -1,7 +1,7 @@
 "use client"
 
-import type { ReactNode } from "react"
 import { useCallback, useEffect, useState } from "react"
+import { EmptyState } from "@/components/empty-state"
 
 interface AuditEvent {
   id: number
@@ -14,10 +14,9 @@ interface AuditEvent {
 
 interface AuditLogResponse {
   events?: AuditEvent[]
-  total?: number
 }
 
-const PAGE_SIZE = 20
+const LIMIT = 20
 
 const EVENT_COLOR: Record<string, string> = {
   "auth.login":              "var(--jelly-green)",
@@ -41,7 +40,7 @@ function groupByDate(events: AuditEvent[]) {
       ? "Today"
       : d === yesterday
         ? "Yesterday"
-        : `${String(eventDate.getDate()).padStart(2, "0")} ${eventDate.toLocaleString(undefined, { month: "short" })}`
+        : `${String(eventDate.getDate()).padStart(2, "0")} ${eventDate.toLocaleString("en-US", { month: "short" })}`
     const last = groups[groups.length - 1]
 
     if (last?.label === label) last.events.push(e)
@@ -54,46 +53,38 @@ function groupByDate(events: AuditEvent[]) {
 export function RecentActivity() {
   const [events, setEvents] = useState<AuditEvent[] | null>(null)
   const [loadError, setLoadError] = useState(false)
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
 
-  const load = useCallback(async (nextPage: number) => {
+  const load = useCallback(async () => {
     setLoadError(false)
-    setEvents(null)
 
     try {
-      const res = await fetch(`/api/account/audit-log?page=${nextPage}&limit=${PAGE_SIZE}`)
+      const res = await fetch(`/api/account/audit-log?page=1&limit=${LIMIT}`)
       if (!res.ok) throw new Error("Could not load recent activity")
 
       const data = await res.json() as AuditLogResponse
       setEvents(data.events ?? [])
-      setTotal(data.total ?? 0)
     } catch {
       setLoadError(true)
       setEvents([])
-      setTotal(0)
     }
   }, [])
 
   useEffect(() => {
+    // Defer to next tick so setState in `load` runs outside the effect body
+    // (react-hooks/set-state-in-effect).
     const timer = window.setTimeout(() => {
-      void load(page)
+      void load()
     }, 0)
 
     return () => window.clearTimeout(timer)
-  }, [load, page])
+  }, [load])
 
-  const start = total === 0 ? 0 : ((page - 1) * PAGE_SIZE) + 1
-  const end = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total)
-  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const showing = `Showing ${start}-${end} of ${total}`
   const groups = groupByDate(events ?? [])
 
   return (
     <section className="overflow-hidden rounded-[var(--jelly-radius-lg)] border border-[var(--jelly-border-std)] bg-[var(--jelly-bg-surface)] shadow-[var(--jelly-shadow-card)]">
-      <div className="flex items-center justify-between border-b border-[var(--jelly-border-subtle)] px-5 py-3.5">
+      <div className="border-b border-[var(--jelly-border-subtle)] px-5 py-3.5">
         <h2 className="jelly-tiny-upper">Activity</h2>
-        <span className="font-mono text-xs text-[var(--jelly-fg-4)]">{showing}</span>
       </div>
 
       {events === null && <SkeletonRows />}
@@ -112,8 +103,8 @@ export function RecentActivity() {
               </div>
               {group.events.map((e, i) => {
                 const clientId = typeof e.metadata?.client_id === "string" ? e.metadata.client_id : ""
-                const ip = e.ip_address ? e.ip_address.replace(/\/\d+$/, "") : "unknown"
-                const time = new Date(e.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                const ip = e.ip_address ? e.ip_address.replace(/\/\d+$/, "") : ""
+                const time = new Date(e.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })
 
                 return (
                   <div
@@ -128,8 +119,12 @@ export function RecentActivity() {
                       />
                       <span className="shrink-0 font-medium text-[var(--jelly-fg-2)]">{e.event_type}</span>
                       {clientId && <span className="truncate">{clientId}</span>}
-                      <span className="shrink-0">·</span>
-                      <span className="shrink-0">{ip}</span>
+                      {ip && (
+                        <>
+                          <span className="shrink-0">·</span>
+                          <span className="shrink-0">{ip}</span>
+                        </>
+                      )}
                       <span className="ml-auto shrink-0">{time}</span>
                     </div>
 
@@ -157,28 +152,6 @@ export function RecentActivity() {
           ))}
         </div>
       )}
-
-      <div className="flex items-center justify-between gap-3 border-t border-[var(--jelly-border-subtle)] px-5 py-3">
-        <span className="font-mono text-xs text-[var(--jelly-fg-4)]">{showing}</span>
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-            disabled={page === 1 || events === null}
-            className="cursor-pointer rounded-[var(--jelly-radius-md)] border border-[var(--jelly-border-std)] bg-white px-3 py-1.5 text-[13px] font-medium text-[var(--jelly-fg-1)] shadow-[var(--jelly-shadow-subtle)] transition-colors hover:bg-[var(--jelly-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            onClick={() => setPage((current) => Math.min(lastPage, current + 1))}
-            disabled={page >= lastPage || events === null}
-            className="cursor-pointer rounded-[var(--jelly-radius-md)] border border-[var(--jelly-border-std)] bg-white px-3 py-1.5 text-[13px] font-medium text-[var(--jelly-fg-1)] shadow-[var(--jelly-shadow-subtle)] transition-colors hover:bg-[var(--jelly-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      </div>
     </section>
   )
 }
@@ -190,19 +163,11 @@ function SkeletonRows() {
         <div
           key={row}
           className="px-5 py-2.5"
-          style={row < 3 ? { borderBottom: "1px solid var(--account-border)" } : {}}
+          style={row < 3 ? { borderBottom: "1px solid var(--jelly-border-subtle)" } : {}}
         >
           <div className="h-4 w-full animate-pulse rounded bg-[var(--jelly-bg-muted)]" />
         </div>
       ))}
-    </div>
-  )
-}
-
-function EmptyState({ children }: { children: ReactNode }) {
-  return (
-    <div className="px-5 py-5">
-      <p className="text-sm text-[var(--account-text-secondary)]">{children}</p>
     </div>
   )
 }

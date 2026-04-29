@@ -62,13 +62,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/?error=invalid_token", req.url))
   }
 
-  const email = claims.email as string
+  // authgate sets IDTokenUserinfoClaimsAssertion=false, so email/name are
+  // NOT in the id_token — fetch them from /userinfo using the access_token.
+  let email = (claims.email as string | undefined) ?? ""
+  let name = (claims.name as string | undefined) ?? ""
+
+  try {
+    const userinfoRes = await fetch(`${config.authgate.issuer}/userinfo`, {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+      cache: "no-store",
+    })
+    if (userinfoRes.ok) {
+      const ui = (await userinfoRes.json()) as { email?: string; name?: string }
+      email = ui.email ?? email
+      name = ui.name ?? name
+    }
+  } catch {
+    // userinfo failure is non-fatal; session falls back to id_token claims
+  }
 
   // Save session
   const session = await getSession()
   session.sub = claims.sub as string
   session.email = email
-  session.name = (claims.name as string) ?? email
+  session.name = name || email
   session.accessToken = tokens.access_token
   session.refreshToken = tokens.refresh_token
   session.idTokenClaims = claims

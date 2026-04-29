@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ConnectedApps } from "./connected-apps"
-import { OverviewTab } from "./overview-tab"
+import { OverviewTab } from "./overview"
 import { RecentActivity } from "./recent-activity"
 
 type TabId = "overview" | "services" | "activity"

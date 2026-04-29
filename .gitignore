@@ -41,6 +41,9 @@ yarn-error.log*
 next-env.d.ts
 tsconfig.tsbuildinfo
 
+# claude code project-local state
+.claude/
+
 # oh-my-claudecode local state
 .omc/
 
@@ -52,3 +55,4 @@ tsconfig.tsbuildinfo
 
 # local screenshots
 *.png
+!app/icon.png

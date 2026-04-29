@@ -41,14 +41,14 @@ Login (/)
 ┌────────────────────────────────────────────────────┐
 │ authgate account                                   │
 ├────────────────────────────────────────────────────┤
-│             [BLOB]                                 │
 │        Manage connected services                   │
 │   See which services can access your authgate ...  │
 │                                                    │
 │   ┌───────────────────────────────────────────┐    │
-│   │ Continue with authgate                    │    │
-│   │ Sign in via Google                        │    │
+│   │ [G]  Sign in with Google                  │    │
 │   └───────────────────────────────────────────┘    │
+├────────────────────────────────────────────────────┤
+│ authgate.project-jelly.io                          │
 └────────────────────────────────────────────────────┘
 
 Account (/account)
@@ -67,7 +67,7 @@ Account (/account)
 Three tabs:
 - **Overview** — read-only Email / Name / Status
 - **Services** (default) — connected apps with per-row Revoke
-- **Activity** — paginated audit log (page size 20, Prev/Next)
+- **Activity** — last 20 events, reverse-chronological, no pagination (1-person tool; volume stays small)
 
 Single route `/account`; tabs are client-side state (no URL routing required for V1).
 
@@ -194,16 +194,15 @@ Single-route SPA-style page. No additional pages such as `view all activity` or 
 
 ## Login UX (locked)
 
-The sign-in CTA must surface the authgate → upstream IdP chain so the user is not surprised by the next screen.
+The sign-in CTA uses Google's standard sign-in button pattern — one familiar visual, one short label.
 
 ```
 ┌─────────────────────────────────────────┐
-│  Continue with authgate                 │  ← primary, brand fill
-│  Sign in via Google                     │  ← subtitle
+│ [G]  Sign in with Google                │  ← white bg, Google G mark
 └─────────────────────────────────────────┘
 ```
 
-Authgate is the issuer; Google (or future upstream IdP) is named explicitly. Both lines stay inside one button — they describe one action.
+The fact that authgate is the OIDC issuer (Google is just the upstream IdP) is a protocol detail, not a UI detail. The header brand "authgate account" and the footer issuer hostname (`authgate.project-jelly.io`) make the issuer visible without burdening the button copy.
 
 ## What this also is — secondary identity
 
