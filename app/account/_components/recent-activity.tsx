@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { EmptyState } from "@/components/empty-state"
+import { EmptyState } from "./empty-state"
 
 interface AuditEvent {
   id: number
@@ -59,6 +59,10 @@ export function RecentActivity() {
 
     try {
       const res = await fetch(`/api/account/audit-log?page=1&limit=${LIMIT}`)
+      if (res.status === 401) {
+        window.location.assign("/")
+        return
+      }
       if (!res.ok) throw new Error("Could not load recent activity")
 
       const data = await res.json() as AuditLogResponse

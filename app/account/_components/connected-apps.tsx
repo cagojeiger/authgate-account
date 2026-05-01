@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { EmptyState } from "@/components/empty-state"
+import { EmptyState } from "./empty-state"
 
 interface Connection {
   client_id: string
@@ -30,6 +30,10 @@ export function ConnectedApps({ ownClientId }: Props) {
 
     try {
       const res = await fetch("/api/account/connections")
+      if (res.status === 401) {
+        window.location.assign("/")
+        return
+      }
       if (!res.ok) throw new Error("Could not load connected services")
 
       const data = await res.json() as ConnectionsResponse
@@ -54,7 +58,11 @@ export function ConnectedApps({ ownClientId }: Props) {
     setDisconnecting(svc.client_id)
 
     try {
-      await fetch(`/api/account/connections/${svc.client_id}`, { method: "DELETE" })
+      const res = await fetch(`/api/account/connections/${svc.client_id}`, { method: "DELETE" })
+      if (res.status === 401) {
+        window.location.assign("/")
+        return
+      }
     } finally {
       setModalApp(null)
       setDisconnecting(null)
