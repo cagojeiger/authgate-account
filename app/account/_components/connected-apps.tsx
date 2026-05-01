@@ -126,28 +126,26 @@ export function ConnectedApps({ ownClientId }: Props) {
                     <span className="min-w-0 truncate font-mono text-xs text-[var(--jelly-fg-4)]">
                       {svc.last_used ? `last used ${formatRelative(svc.last_used)}` : "never used"}
                     </span>
-                    {!isSelf && (
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        {svc.url && (
-                          <a
-                            href={svc.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-[var(--jelly-radius-md)] px-2 py-1 text-xs font-medium text-[var(--jelly-brand-deep)] transition-colors hover:bg-[var(--jelly-brand-soft)]"
-                          >
-                            Open ↗
-                          </a>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setModalApp(svc)}
-                          disabled={isBusy}
-                          className="cursor-pointer rounded-[var(--jelly-radius-md)] border border-[var(--jelly-border-std)] bg-white px-2 py-1 text-xs font-medium text-[var(--jelly-red)] shadow-[var(--jelly-shadow-subtle)] transition-colors hover:bg-[rgba(224,54,91,0.04)] disabled:cursor-not-allowed disabled:opacity-50"
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {!isSelf && svc.url && (
+                        <a
+                          href={svc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-[var(--jelly-radius-md)] px-2 py-1 text-xs font-medium text-[var(--jelly-brand-deep)] transition-colors hover:bg-[var(--jelly-brand-soft)]"
                         >
-                          {isBusy ? "Revoking" : "Revoke"}
-                        </button>
-                      </div>
-                    )}
+                          Open ↗
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setModalApp(svc)}
+                        disabled={isBusy}
+                        className="cursor-pointer rounded-[var(--jelly-radius-md)] border border-[var(--jelly-border-std)] bg-white px-2 py-1 text-xs font-medium text-[var(--jelly-red)] shadow-[var(--jelly-shadow-subtle)] transition-colors hover:bg-[rgba(224,54,91,0.04)] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {isBusy ? "Revoking" : "Revoke"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
