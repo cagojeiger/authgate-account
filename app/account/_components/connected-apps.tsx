@@ -31,7 +31,7 @@ export function ConnectedApps({ ownClientId }: Props) {
     try {
       const res = await fetch("/api/account/connections")
       if (res.status === 401) {
-        window.location.assign("/")
+        window.location.replace("/")
         return
       }
       if (!res.ok) throw new Error("Could not load connected services")
@@ -60,13 +60,13 @@ export function ConnectedApps({ ownClientId }: Props) {
     try {
       const res = await fetch(`/api/account/connections/${svc.client_id}`, { method: "DELETE" })
       if (res.status === 401) {
-        window.location.assign("/")
+        window.location.replace("/")
         return
       }
+      await load()
     } finally {
       setModalApp(null)
       setDisconnecting(null)
-      await load()
     }
   }
 

@@ -12,12 +12,7 @@ const sessionOptions = {
   },
 }
 
-const protectedPaths = ["/account"]
-
 export async function proxy(req: NextRequest) {
-  const isProtected = protectedPaths.some((p) => req.nextUrl.pathname.startsWith(p))
-  if (!isProtected) return NextResponse.next()
-
   const res = NextResponse.next()
   const session = await getIronSession<SessionData>(req, res, sessionOptions)
 

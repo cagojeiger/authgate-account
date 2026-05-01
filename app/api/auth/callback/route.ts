@@ -88,7 +88,6 @@ export async function GET(req: NextRequest) {
   session.name = name || email
   session.accessToken = tokens.access_token
   session.refreshToken = tokens.refresh_token
-  session.idTokenClaims = claims
   await session.save()
 
   return NextResponse.redirect(new URL("/account", req.url))

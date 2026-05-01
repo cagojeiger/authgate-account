@@ -16,8 +16,6 @@ interface AuditLogResponse {
   events?: AuditEvent[]
 }
 
-const LIMIT = 20
-
 const EVENT_COLOR: Record<string, string> = {
   "auth.login":              "var(--jelly-green)",
   "auth.signup":             "var(--jelly-brand-deep)",
@@ -58,9 +56,9 @@ export function RecentActivity() {
     setLoadError(false)
 
     try {
-      const res = await fetch(`/api/account/audit-log?page=1&limit=${LIMIT}`)
+      const res = await fetch("/api/account/audit-log")
       if (res.status === 401) {
-        window.location.assign("/")
+        window.location.replace("/")
         return
       }
       if (!res.ok) throw new Error("Could not load recent activity")

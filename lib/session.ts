@@ -8,7 +8,6 @@ export interface SessionData {
   name: string
   accessToken: string
   refreshToken: string
-  idTokenClaims: Record<string, unknown>
 }
 
 const sessionOptions = {

@@ -4,10 +4,9 @@ import { getSession } from "@/lib/session"
 
 export async function GET() {
   const session = await getSession()
-  if (!session.sub) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session.sub) return new NextResponse(null, { status: 401 })
 
   const res = await authgateFetch("/console/me/connections", session)
-  if (res.status === 401) return NextResponse.json({ error: "session_expired" }, { status: 401 })
-  if (!res.ok) return NextResponse.json({ connections: [] })
+  if (!res.ok) return new NextResponse(null, { status: res.status })
   return NextResponse.json(await res.json())
 }
