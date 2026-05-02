@@ -17,7 +17,7 @@ export async function proxy(req: NextRequest) {
   const session = await getIronSession<SessionData>(req, res, sessionOptions)
 
   if (!session.sub) {
-    return NextResponse.redirect(new URL("/", req.url))
+    return NextResponse.redirect(new URL("/", process.env.APP_URL ?? req.url))
   }
 
   return res
