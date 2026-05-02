@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
-import { authgateFetch } from "@/lib/authgate"
-import { getSession } from "@/lib/session"
+import { authgateClient } from "@/lib/api/authgate-client"
+import { requireUser } from "@/lib/auth/require-user"
 
 export async function GET() {
-  const session = await getSession()
-  if (!session.sub) return new NextResponse(null, { status: 401 })
+  const session = await requireUser()
+  if (!session) return new NextResponse(null, { status: 401 })
 
-  const res = await authgateFetch("/console/me/connections", session)
+  const res = await authgateClient.getConnections(session)
   if (!res.ok) return new NextResponse(null, { status: res.status })
   return NextResponse.json(await res.json())
 }

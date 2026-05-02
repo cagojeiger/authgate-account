@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getIronSession } from "iron-session"
-import { SessionData } from "@/lib/session"
+import { SessionData } from "@/lib/auth/session"
 
 const sessionOptions = {
   cookieName: "aa_session",

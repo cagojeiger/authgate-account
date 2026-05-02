@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { config } from "@/lib/config"
-import { generateCodeVerifier, generateCodeChallenge, generateState } from "@/lib/pkce"
+import { config } from "@/lib/env"
+import { generateCodeVerifier, generateCodeChallenge, generateState } from "@/lib/auth/pkce"
 
 export async function GET() {
   const codeVerifier = await generateCodeVerifier()

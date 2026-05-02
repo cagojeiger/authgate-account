@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server"
-import { authgateFetch } from "@/lib/authgate"
-import { getSession } from "@/lib/session"
+import { authgateClient } from "@/lib/api/authgate-client"
+import { requireUser } from "@/lib/auth/require-user"
 
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ client_id: string }> },
 ) {
   const { client_id } = await params
-  const session = await getSession()
-  if (!session.sub) return new NextResponse(null, { status: 401 })
+  const session = await requireUser()
+  if (!session) return new NextResponse(null, { status: 401 })
 
-  const res = await authgateFetch(`/console/me/connections/${client_id}`, session, {
-    method: "DELETE",
-  })
+  const res = await authgateClient.revokeConnection(session, client_id)
   return new NextResponse(null, { status: res.ok ? 204 : res.status })
 }

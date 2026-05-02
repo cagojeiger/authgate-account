@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation"
 import { BottomBar } from "@/components/bottom-bar"
 import { TopBar } from "@/components/top-bar"
-import { config } from "@/lib/config"
-import { getSession } from "@/lib/session"
+import { config } from "@/lib/env"
+import { getSession } from "@/lib/auth/session"
 import { AccountTabs } from "./_components/tabs"
 
 export default async function Account() {

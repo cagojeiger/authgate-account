@@ -1,5 +1,5 @@
 import type { IronSession } from "iron-session"
-import { config } from "./config"
+import { config } from "@/lib/env"
 import type { SessionData } from "./session"
 
 async function refreshAccessToken(session: IronSession<SessionData>): Promise<boolean> {

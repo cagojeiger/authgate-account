@@ -1,6 +1,6 @@
 import { getIronSession, IronSession } from "iron-session"
 import { cookies } from "next/headers"
-import { config } from "./config"
+import { config } from "@/lib/env"
 
 export interface SessionData {
   sub: string

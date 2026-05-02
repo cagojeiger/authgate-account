@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { config } from "@/lib/config"
-import { getSession } from "@/lib/session"
+import { config } from "@/lib/env"
+import { getSession } from "@/lib/auth/session"
 
 export async function POST() {
   const session = await getSession()
