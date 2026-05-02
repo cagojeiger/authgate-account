@@ -4,14 +4,31 @@ function required(key: string): string {
   return value
 }
 
+interface AuthgateConfig {
+  issuer: string
+  clientId: string
+  redirectUri: string
+}
+
+interface SessionConfig {
+  secret: string
+}
+
+let _authgate: AuthgateConfig | undefined
+let _session: SessionConfig | undefined
+
 export const config = {
-  authgate: {
-    issuer: required("AUTHGATE_ISSUER"),
-    clientId: required("AUTHGATE_CLIENT_ID"),
-    redirectUri: required("AUTHGATE_REDIRECT_URI"),
+  get authgate(): AuthgateConfig {
+    return (_authgate ??= {
+      issuer: required("AUTHGATE_ISSUER"),
+      clientId: required("AUTHGATE_CLIENT_ID"),
+      redirectUri: required("AUTHGATE_REDIRECT_URI"),
+    })
   },
-  session: {
-    secret: required("SESSION_SECRET"),
+  get session(): SessionConfig {
+    return (_session ??= {
+      secret: required("SESSION_SECRET"),
+    })
   },
   appUrl: process.env.APP_URL ?? "http://localhost:3000",
 }

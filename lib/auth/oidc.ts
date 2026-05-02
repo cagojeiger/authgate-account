@@ -8,7 +8,10 @@ export interface TokenResponse {
   [key: string]: unknown
 }
 
-const jwks = createRemoteJWKSet(new URL(`${config.authgate.issuer}/keys`))
+let _jwks: ReturnType<typeof createRemoteJWKSet> | undefined
+function jwks() {
+  return (_jwks ??= createRemoteJWKSet(new URL(`${config.authgate.issuer}/keys`)))
+}
 
 export async function exchangeCode(code: string, verifier: string): Promise<TokenResponse | null> {
   try {
@@ -33,7 +36,7 @@ export async function exchangeCode(code: string, verifier: string): Promise<Toke
 
 export async function verifyIdToken(idToken: string): Promise<Record<string, unknown> | null> {
   try {
-    const { payload } = await jwtVerify(idToken, jwks, {
+    const { payload } = await jwtVerify(idToken, jwks(), {
       issuer: config.authgate.issuer,
       audience: config.authgate.clientId,
     })

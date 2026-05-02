@@ -2,6 +2,8 @@ import { BottomBar } from "@/components/bottom-bar"
 import { TopBar } from "@/components/top-bar"
 import { config } from "@/lib/env"
 
+export const dynamic = "force-dynamic"
+
 export default function Home() {
   const issuer = new URL(config.authgate.issuer).hostname
 

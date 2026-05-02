@@ -58,11 +58,4 @@ jobs:
 
       - run: npx tsc --noEmit
 
-      # lib/env.ts asserts env presence at module-load, so build needs dummies.
-      - name: next build
-        run: npm run build
-        env:
-          AUTHGATE_ISSUER: https://example.com
-          AUTHGATE_CLIENT_ID: dummy
-          AUTHGATE_REDIRECT_URI: https://example.com/api/auth/callback
-          SESSION_SECRET: dummy_session_secret_at_least_32_characters_long
+      - run: npm run build

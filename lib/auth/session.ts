@@ -10,16 +10,18 @@ export interface SessionData {
   refreshToken: string
 }
 
-const sessionOptions = {
-  cookieName: "aa_session",
-  password: config.session.secret,
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: "lax" as const,
-  },
+function sessionOptions() {
+  return {
+    cookieName: "aa_session",
+    password: config.session.secret,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax" as const,
+    },
+  }
 }
 
 export async function getSession(): Promise<IronSession<SessionData>> {
-  return getIronSession<SessionData>(await cookies(), sessionOptions)
+  return getIronSession<SessionData>(await cookies(), sessionOptions())
 }
