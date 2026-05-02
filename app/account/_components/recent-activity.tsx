@@ -1,20 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import type { AuditEvent } from "../_queries/get-account-data"
 import { EmptyState } from "./empty-state"
-
-interface AuditEvent {
-  id: number
-  event_type: string
-  ip_address: string
-  user_agent: string
-  metadata: Record<string, unknown>
-  created_at: string
-}
-
-interface AuditLogResponse {
-  events?: AuditEvent[]
-}
 
 const EVENT_COLOR: Record<string, string> = {
   "auth.login":              "var(--jelly-green)",
@@ -48,9 +36,13 @@ function groupByDate(events: AuditEvent[]) {
   return groups
 }
 
-export function RecentActivity() {
-  const [events, setEvents] = useState<AuditEvent[] | null>(null)
-  const [loadError, setLoadError] = useState(false)
+interface Props {
+  initialEvents: AuditEvent[] | null
+}
+
+export function RecentActivity({ initialEvents }: Props) {
+  const [events, setEvents] = useState<AuditEvent[] | null>(initialEvents)
+  const [loadError, setLoadError] = useState(initialEvents === null)
 
   const load = useCallback(async () => {
     setLoadError(false)
@@ -63,7 +55,7 @@ export function RecentActivity() {
       }
       if (!res.ok) throw new Error("Could not load recent activity")
 
-      const data = await res.json() as AuditLogResponse
+      const data = await res.json() as { events?: AuditEvent[] }
       setEvents(data.events ?? [])
     } catch {
       setLoadError(true)
@@ -89,8 +81,8 @@ export function RecentActivity() {
         <h2 className="jelly-tiny-upper">Activity</h2>
       </div>
 
-      {events === null && <SkeletonRows />}
-      {events !== null && loadError && <EmptyState>Could not load recent activity.</EmptyState>}
+      {events === null && !loadError && <SkeletonRows />}
+      {loadError && <EmptyState>Could not load recent activity.</EmptyState>}
       {events !== null && !loadError && events.length === 0 && (
         <EmptyState>No recent activity.</EmptyState>
       )}

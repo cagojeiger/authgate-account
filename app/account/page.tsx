@@ -1,13 +1,19 @@
+import type { IronSession } from "iron-session"
 import { redirect } from "next/navigation"
 import { BottomBar } from "@/components/bottom-bar"
 import { TopBar } from "@/components/top-bar"
 import { config } from "@/lib/env"
-import { getSession } from "@/lib/auth/session"
+import { getSession, type SessionData } from "@/lib/auth/session"
 import { AccountTabs } from "./_components/tabs"
+import { getAccountData } from "./_queries/get-account-data"
+
+type Session = IronSession<SessionData>
 
 export default async function Account() {
   const session = await getSession()
   if (!session.sub) redirect("/")
+
+  const data = await getAccountData(session as Session)
 
   const issuer = new URL(config.authgate.issuer).hostname
   const accountSession = {
@@ -42,6 +48,7 @@ export default async function Account() {
         session={accountSession}
         issuer={issuer}
         ownClientId={config.authgate.clientId}
+        initial={data}
       />
 
       <BottomBar issuer={issuer} />

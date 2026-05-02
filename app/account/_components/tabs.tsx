@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import type { AccountInitialData } from "../_queries/get-account-data"
 import { ConnectedApps } from "./connected-apps"
 import { OverviewTab } from "./overview"
 import { RecentActivity } from "./recent-activity"
@@ -17,6 +18,7 @@ interface Props {
   session: AccountSession
   issuer: string
   ownClientId: string
+  initial: AccountInitialData
 }
 
 const TABS: { id: TabId; label: string }[] = [
@@ -25,7 +27,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "activity", label: "Activity" },
 ]
 
-export function AccountTabs({ session, issuer, ownClientId }: Props) {
+export function AccountTabs({ session, issuer, ownClientId, initial }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("services")
 
   return (
@@ -63,8 +65,13 @@ export function AccountTabs({ session, issuer, ownClientId }: Props) {
       <main id={`${activeTab}-panel`} role="tabpanel" className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[1100px] px-4 py-6 sm:px-5 sm:py-8 lg:px-6">
           {activeTab === "overview" && <OverviewTab session={session} issuer={issuer} />}
-          {activeTab === "services" && <ConnectedApps ownClientId={ownClientId} />}
-          {activeTab === "activity" && <RecentActivity />}
+          {activeTab === "services" && (
+            <ConnectedApps
+              ownClientId={ownClientId}
+              initialConnections={initial.connections}
+            />
+          )}
+          {activeTab === "activity" && <RecentActivity initialEvents={initial.events} />}
         </div>
       </main>
     </div>

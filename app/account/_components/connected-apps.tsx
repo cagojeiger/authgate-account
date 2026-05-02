@@ -1,27 +1,17 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import type { Connection } from "../_queries/get-account-data"
 import { EmptyState } from "./empty-state"
-
-interface Connection {
-  client_id: string
-  name: string
-  url?: string | null
-  scopes: string[]
-  last_used: string
-}
-
-interface ConnectionsResponse {
-  connections?: Connection[]
-}
 
 interface Props {
   ownClientId?: string
+  initialConnections: Connection[] | null
 }
 
-export function ConnectedApps({ ownClientId }: Props) {
-  const [connections, setConnections] = useState<Connection[] | null>(null)
-  const [loadError, setLoadError] = useState(false)
+export function ConnectedApps({ ownClientId, initialConnections }: Props) {
+  const [connections, setConnections] = useState<Connection[] | null>(initialConnections)
+  const [loadError, setLoadError] = useState(initialConnections === null)
   const [modalApp, setModalApp] = useState<Connection | null>(null)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
 
@@ -36,7 +26,7 @@ export function ConnectedApps({ ownClientId }: Props) {
       }
       if (!res.ok) throw new Error("Could not load connected services")
 
-      const data = await res.json() as ConnectionsResponse
+      const data = await res.json() as { connections?: Connection[] }
       setConnections(data.connections ?? [])
     } catch {
       setLoadError(true)
@@ -81,8 +71,8 @@ export function ConnectedApps({ ownClientId }: Props) {
         </span>
       </div>
 
-      {connections === null && <SkeletonRows />}
-      {connections !== null && loadError && <EmptyState>Could not load connected apps.</EmptyState>}
+      {connections === null && !loadError && <SkeletonRows />}
+      {loadError && <EmptyState>Could not load connected apps.</EmptyState>}
       {connections !== null && !loadError && connections.length === 0 && (
         <EmptyState>No connected apps.</EmptyState>
       )}
