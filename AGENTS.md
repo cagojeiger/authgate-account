@@ -1,6 +1,6 @@
 # Read first
 
-- `PURPOSE.md` — what this console is for, scope guardrails, and the 4-step validation test for any new feature. Apply it before adding anything.
+- `docs/PURPOSE.md` — what this console is for, scope guardrails, and the 4-step validation test for any new feature. Apply it before adding anything.
 - `.repos/authgate/docs/adr/000-authgate-identity.md` — authgate's identity. Console must not violate authgate's Non-goals.
 
 <!-- BEGIN:nextjs-agent-rules -->
