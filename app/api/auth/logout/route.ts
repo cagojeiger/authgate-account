@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { config } from "@/lib/env"
+import { isSameOrigin } from "@/lib/auth/csrf"
 import { getSession } from "@/lib/auth/session"
 
-export async function POST() {
+export async function POST(req: Request) {
+  if (!isSameOrigin(req)) return new NextResponse(null, { status: 403 })
+
   const session = await getSession()
 
   if (session.refreshToken) {
@@ -19,5 +22,5 @@ export async function POST() {
   }
 
   await session.destroy()
-  return NextResponse.redirect(new URL("/", process.env.APP_URL ?? "http://localhost:3000"))
+  return NextResponse.redirect(new URL("/", config.appUrl))
 }

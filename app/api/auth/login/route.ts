@@ -8,21 +8,18 @@ export async function GET() {
   const codeChallenge = await generateCodeChallenge(codeVerifier)
   const state = generateState()
 
+  // PKCE cookies only need to be readable by the callback, so scope them there
+  // and shorten the TTL — 120s is plenty for the IdP round-trip.
   const jar = await cookies()
-  jar.set("pkce_verifier", codeVerifier, {
+  const pkceCookie = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 300, // 5 minutes
-    path: "/",
-  })
-  jar.set("pkce_state", state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 300,
-    path: "/",
-  })
+    sameSite: "lax" as const,
+    maxAge: 120,
+    path: "/api/auth/callback",
+  }
+  jar.set("pkce_verifier", codeVerifier, pkceCookie)
+  jar.set("pkce_state", state, pkceCookie)
 
   const params = new URLSearchParams({
     client_id: config.authgate.clientId,
