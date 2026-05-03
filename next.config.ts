@@ -3,9 +3,16 @@ import type { NextConfig } from "next";
 // CSP only — HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and
 // Permissions-Policy are already injected upstream by Cloudflare + istio. CSP
 // has to be set app-side because only the app knows what's allowed.
+//
+// React's dev runtime uses eval() to reconstruct callstacks; allow it only in
+// development. Production never sees 'unsafe-eval'.
+const isDev = process.env.NODE_ENV !== "production"
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'"
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' data:",

@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { config } from "@/lib/env"
-import { generateCodeVerifier, generateCodeChallenge, generateState } from "@/lib/auth/pkce"
+import * as client from "openid-client"
+import { config as env } from "@/lib/env"
+import { getOidcConfig } from "@/lib/auth/openid"
 
 export async function GET() {
-  const codeVerifier = await generateCodeVerifier()
-  const codeChallenge = await generateCodeChallenge(codeVerifier)
-  const state = generateState()
+  const oidc = await getOidcConfig()
+  const codeVerifier = client.randomPKCECodeVerifier()
+  const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier)
+  const state = client.randomState()
 
-  // PKCE cookies only need to be readable by the callback, so scope them there
+  // PKCE cookies only need to be readable by the callback; scope them there
   // and shorten the TTL — 120s is plenty for the IdP round-trip.
   const jar = await cookies()
   const pkceCookie = {
@@ -21,15 +23,13 @@ export async function GET() {
   jar.set("pkce_verifier", codeVerifier, pkceCookie)
   jar.set("pkce_state", state, pkceCookie)
 
-  const params = new URLSearchParams({
-    client_id: config.authgate.clientId,
-    response_type: "code",
-    redirect_uri: config.authgate.redirectUri,
+  const url = client.buildAuthorizationUrl(oidc, {
+    redirect_uri: env.authgate.redirectUri,
     scope: "openid profile email offline_access",
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
     state,
   })
 
-  return NextResponse.redirect(`${config.authgate.issuer}/authorize?${params}`)
+  return NextResponse.redirect(url.href)
 }
