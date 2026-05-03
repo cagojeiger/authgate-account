@@ -21,10 +21,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/?error=state_mismatch", env.appUrl))
   }
 
+  // Behind a TLS-terminating proxy (istio/Cloudflare) `req.url` is the
+  // pod-internal URL (http://localhost:3000/...), which doesn't match the
+  // `redirect_uri` registered with authgate. Rebuild the callback URL from
+  // env.authgate.redirectUri (the registered, public form) and only carry
+  // over the query params that authgate appended.
+  const callbackUrl = new URL(env.authgate.redirectUri)
+  for (const [k, v] of req.nextUrl.searchParams) callbackUrl.searchParams.set(k, v)
+
   const oidc = await getOidcConfig()
   let tokens
   try {
-    tokens = await client.authorizationCodeGrant(oidc, new URL(req.url), {
+    tokens = await client.authorizationCodeGrant(oidc, callbackUrl, {
       pkceCodeVerifier,
       expectedState,
       idTokenExpected: true,
