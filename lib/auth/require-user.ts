@@ -1,3 +1,4 @@
+import "server-only"
 import { getSession } from "@/lib/auth/session"
 
 export async function requireUser() {

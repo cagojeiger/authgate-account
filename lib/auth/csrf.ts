@@ -1,3 +1,4 @@
+import "server-only"
 import { config } from "@/lib/env"
 
 // State-changing endpoints (POST/DELETE) reject anything that isn't a same-origin

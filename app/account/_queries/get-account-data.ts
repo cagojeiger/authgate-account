@@ -34,7 +34,9 @@ export async function getAccountData(session: Session): Promise<AccountInitialDa
   ])
 
   if (connectionsRes.status === 401 || eventsRes.status === 401) {
-    redirect("/")
+    // Server Component can't write cookies — bounce through the route handler
+    // that destroys the session, then back to /.
+    redirect("/api/auth/expired")
   }
 
   let connections: Connection[] | null = null

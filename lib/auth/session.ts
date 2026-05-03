@@ -1,3 +1,4 @@
+import "server-only"
 import { getIronSession, IronSession } from "iron-session"
 import { cookies } from "next/headers"
 import { config } from "@/lib/env"
@@ -8,9 +9,10 @@ export interface SessionData {
   name: string
   accessToken: string
   refreshToken: string
+  expiresAt: number
 }
 
-function sessionOptions() {
+export function sessionOptions() {
   return {
     cookieName: "aa_session",
     password: config.session.secret,
